@@ -633,6 +633,7 @@ where
     where
         F: Fn(T::Subscriber) -> Box<dyn ActionStateResult> + Send + Sync + 'a,
     {
+        info!("{:?}", filter);
         const fn sorted_awaited_action_state_for_flags(
             stage: OperationStageFlags,
         ) -> Option<SortedAwaitedActionState> {
@@ -652,6 +653,7 @@ where
                 .await
                 .err_tip(|| "In SimpleSchedulerStateManager::filter_operations")?;
             let Some(subscriber) = maybe_subscriber else {
+                info!("A");
                 return Ok(Box::pin(stream::empty()));
             };
             let awaited_action = subscriber
@@ -659,19 +661,23 @@ where
                 .await
                 .err_tip(|| "In SimpleSchedulerStateManager::filter_operations")?;
             if !self.apply_filter_predicate(&awaited_action, &filter).await {
+                info!("B");
                 return Ok(Box::pin(stream::empty()));
             }
+            info!("C");
             return Ok(Box::pin(stream::once(async move {
                 to_action_state_result(subscriber)
             })));
         }
         if let Some(client_operation_id) = &filter.client_operation_id {
+            info!("D");
             let maybe_subscriber = self
                 .action_db
                 .get_awaited_action_by_id(client_operation_id)
                 .await
                 .err_tip(|| "In SimpleSchedulerStateManager::filter_operations")?;
             let Some(subscriber) = maybe_subscriber else {
+                info!("E");
                 return Ok(Box::pin(stream::empty()));
             };
             let awaited_action = subscriber
@@ -679,8 +685,10 @@ where
                 .await
                 .err_tip(|| "In SimpleSchedulerStateManager::filter_operations")?;
             if !self.apply_filter_predicate(&awaited_action, &filter).await {
+                info!("F");
                 return Ok(Box::pin(stream::empty()));
             }
+            info!("G");
             return Ok(Box::pin(stream::once(async move {
                 to_action_state_result(subscriber)
             })));
@@ -689,6 +697,7 @@ where
         let Some(sorted_awaited_action_state) =
             sorted_awaited_action_state_for_flags(filter.stages)
         else {
+            info!("H");
             let mut all_items: Vec<_> = self
                 .action_db
                 .get_all_awaited_actions()
@@ -719,6 +728,7 @@ where
                 Some(OrderDirection::Desc) => all_items.sort_unstable_by(|(_, a), (_, b)| b.cmp(a)),
                 None => {}
             }
+            info!("I");
             return Ok(Box::pin(stream::iter(
                 all_items
                     .into_iter()
@@ -730,6 +740,7 @@ where
             filter.order_by_priority_direction,
             Some(OrderDirection::Desc)
         );
+        info!("J");
         let stream = self
             .action_db
             .get_range_of_actions(

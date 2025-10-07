@@ -27,6 +27,7 @@ use serde::{Deserialize, Serialize};
 mod awaited_action;
 
 /// Duration to wait before sending client keep alive messages.
+//pub const CLIENT_KEEPALIVE_DURATION: Duration = Duration::from_secs(240);
 pub const CLIENT_KEEPALIVE_DURATION: Duration = Duration::from_secs(10);
 
 /// A simple enum to represent the state of an `AwaitedAction`.

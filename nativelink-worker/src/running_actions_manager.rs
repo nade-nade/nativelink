@@ -1299,6 +1299,12 @@ impl RunningActionImpl {
                 error: state.error.clone(),
                 message: String::new(), // Will be filled in on cache_action_result if needed.
             });
+
+            info!(
+                operation_id = ?self.operation_id,
+                exit_code = ?execution_result.exit_code,
+                "Worker finished uploading results",
+            )
         }
         Ok(self)
     }
