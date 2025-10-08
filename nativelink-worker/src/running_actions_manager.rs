@@ -852,7 +852,8 @@ impl RunningActionImpl {
                 "{}/{}",
                 self.work_directory, command_proto.working_directory
             ))
-            .env_clear();
+            .env_clear()
+            .arg0(args[0]);
 
         let requested_timeout = if self.action_info.timeout.is_zero() {
             self.running_actions_manager.max_action_timeout
